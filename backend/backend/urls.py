@@ -17,14 +17,36 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from users.views import login_view, logout_view
-from tasks.views import dashboard
+
+from users.views import (
+    login_view, logout_view, 
+    user_list, user_create, user_update, user_delete
+)
+from tasks.views import (
+    dashboard, 
+    task_list, task_create, task_update, task_delete, task_report_view
+)
 
 urlpatterns = [
-    # Web pages
+    # Auth Web pages
     path('', login_view, name='login'),
-    path('dashboard/', dashboard, name='dashboard'),
     path('logout/', logout_view, name='logout'),
+    
+    # Dashboard
+    path('dashboard/', dashboard, name='dashboard'),
+
+    # User Management Web pages
+    path('users/', user_list, name='user_list'),
+    path('users/create/', user_create, name='user_create'),
+    path('users/<int:id>/edit/', user_update, name='user_update'),
+    path('users/<int:id>/delete/', user_delete, name='user_delete'),
+
+    # Task Management Web pages
+    path('manage-tasks/', task_list, name='task_list'),
+    path('manage-tasks/create/', task_create, name='task_create'),
+    path('manage-tasks/<int:id>/edit/', task_update, name='task_update'),
+    path('manage-tasks/<int:id>/delete/', task_delete, name='task_delete'),
+    path('manage-tasks/<int:id>/report/', task_report_view, name='task_report_view'),
 
     # Admin
     path('admin/', admin.site.urls),
@@ -32,7 +54,7 @@ urlpatterns = [
     # APIs
     path('api/', include('tasks.urls')),
 
-    # JWT
+    # JWT Authentication
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

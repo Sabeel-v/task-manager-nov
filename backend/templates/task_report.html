@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Task Report - TaskFlow{% endblock %}
+{% block page_title %}Task Completion Report{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px;">
+    <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px;">
+        <h3 style="margin: 0 0 10px 0; color: var(--primary-color);">{{ task.title }}</h3>
+        <p style="margin: 0; color: var(--text-muted);">
+            <i class="fa-solid fa-user"></i> Assigned To: <strong>{{ task.assigned_to.username }}</strong> |
+            <i class="fa-solid fa-calendar-check"></i> Completed On: <strong>{{ task.due_date }}</strong>
+        </p>
+    </div>
+
+    <div style="margin-bottom: 25px;">
+        <h4 style="color: var(--text-muted); margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase;">Worked Hours</h4>
+        <p style="font-size: 1.5rem; font-weight: 600; margin: 0;">{{ task.worked_hours }} <span style="font-size: 1rem; font-weight: 400; color: var(--text-muted);">hrs</span></p>
+    </div>
+
+    <div>
+        <h4 style="color: var(--text-muted); margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase;">Completion Report</h4>
+        <div style="background-color: var(--bg-color); padding: 15px; border-radius: 6px; border: 1px solid var(--border-color); line-height: 1.6;">
+            {{ task.completion_report|linebreaks }}
+        </div>
+    </div>
+
+    <div style="margin-top: 30px;">
+        <a href="{% url 'task_list' %}" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Back to Tasks</a>
+    </div>
+</div>
+{% endblock %}

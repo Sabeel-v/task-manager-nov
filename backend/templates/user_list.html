@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Users - TaskFlow{% endblock %}
+{% block page_title %}User & Admin Management{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="margin: 0;">All Users</h3>
+        <a href="{% url 'user_create' %}" class="btn"><i class="fa-solid fa-plus"></i> Add User</a>
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Assigned Admin</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users_list %}
+                <tr>
+                    <td>{{ u.username }}</td>
+                    <td><span class="badge" style="background-color: var(--border-color); color: var(--text-main);">{{ u.get_role_display }}</span></td>
+                    <td>{{ u.assigned_admin.username|default:"-" }}</td>
+                    <td>
+                        <a href="{% url 'user_update' u.id %}" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem;"><i class="fa-solid fa-pen"></i> Edit</a>
+                        {% if u.id != request.user.id %}
+                        <a href="{% url 'user_delete' u.id %}" class="btn btn-danger" style="padding: 4px 8px; font-size: 0.8rem; margin-left: 5px;"><i class="fa-solid fa-trash"></i> Delete</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 20px;">No users found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

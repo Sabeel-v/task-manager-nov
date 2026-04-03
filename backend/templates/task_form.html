@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Edit Task{% else %}Create Task{% endif %} - TaskFlow{% endblock %}
+{% block page_title %}{% if object %}Edit Task{% else %}Create Task{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px;">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" name="title" class="form-control" value="{{ object.title }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" class="form-control" rows="4" required>{{ object.description }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Assigned To</label>
+            <select name="assigned_to" class="form-control" required>
+                {% for u in users %}
+                <option value="{{ u.id }}" {% if object.assigned_to_id == u.id %}selected{% endif %}>{{ u.username }} ({{ u.get_role_display }})</option>
+                {% endfor %}
+            </select>
+            <small style="color: var(--text-muted); display: block; margin-top: 5px;">
+                {% if request.user.role == 'admin' %}You can only assign tasks to users managed by you.{% endif %}
+            </small>
+        </div>
+
+        <div class="form-group">
+            <label>Due Date</label>
+            <input type="date" name="due_date" class="form-control" value="{{ object.due_date|date:'Y-m-d' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Status</label>
+            <select name="status" class="form-control" required>
+                <option value="pending" {% if object.status == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="in_progress" {% if object.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                <option value="completed" {% if object.status == 'completed' %}selected{% endif %}>Completed</option>
+            </select>
+        </div>
+
+        {% if object.status == 'completed' %}
+        <div class="form-group">
+            <label>Completion Report</label>
+            <textarea name="completion_report" class="form-control" rows="3">{{ object.completion_report }}</textarea>
+        </div>
+        <div class="form-group">
+            <label>Worked Hours</label>
+            <input type="number" step="0.1" name="worked_hours" class="form-control" value="{{ object.worked_hours }}">
+        </div>
+        {% endif %}
+
+        <div style="margin-top: 20px;">
+            <button type="submit" class="btn">Save</button>
+            <a href="{% url 'task_list' %}" class="btn btn-outline" style="margin-left: 10px;">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

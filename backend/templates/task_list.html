@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Tasks - TaskFlow{% endblock %}
+{% block page_title %}Manage Tasks{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="margin: 0;">Task List</h3>
+        <a href="{% url 'task_create' %}" class="btn"><i class="fa-solid fa-plus"></i> Create Task</a>
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Assigned To</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in tasks %}
+                <tr>
+                    <td>{{ t.title }}</td>
+                    <td>{{ t.assigned_to.username }}</td>
+                    <td>{{ t.due_date }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if t.status == 'pending' %}badge-pending
+                            {% elif t.status == 'in_progress' %}badge-progress
+                            {% else %}badge-completed{% endif %}">
+                            {{ t.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'task_update' t.id %}" class="btn btn-outline" style="padding: 4px 8px; font-size: 0.8rem;"><i class="fa-solid fa-pen"></i> Edit</a>
+                        {% if t.status == 'completed' %}
+                        <a href="{% url 'task_report_view' t.id %}" class="btn" style="padding: 4px 8px; font-size: 0.8rem; margin-left: 5px; background-color: var(--success);"><i class="fa-solid fa-file-lines"></i> Report</a>
+                        {% endif %}
+                        <form action="{% url 'task_delete' t.id %}" method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger" style="padding: 4px 8px; font-size: 0.8rem; margin-left: 5px;" onclick="return confirm('Are you sure you want to delete this task?');"><i class="fa-solid fa-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 20px;">No tasks found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
