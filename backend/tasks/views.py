@@ -2,12 +2,15 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from users.models import User
 
 from .models import Task
 from .serializers import TaskSerializer
 
 
-# ✅ GET TASKS
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_tasks(request):
@@ -16,7 +19,7 @@ def get_tasks(request):
     return Response(serializer.data)
 
 
-# ✅ UPDATE TASK
+
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_task(request, id):
@@ -38,7 +41,7 @@ def update_task(request, id):
     return Response(serializer.errors, status=400)
 
 
-# ✅ TASK REPORT
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def task_report(request, id):
@@ -53,3 +56,33 @@ def task_report(request, id):
         "completion_report": task.completion_report,
         "worked_hours": task.worked_hours
     })
+
+@login_required
+def dashboard(request):
+
+    if request.user.role == 'superadmin':
+        users = User.objects.all()
+        tasks = Task.objects.all()
+
+        return render(request, 'dashboard.html', {
+            'users': users,
+            'tasks': tasks,
+            'role': 'superadmin'
+        })
+
+    elif request.user.role == 'admin':
+        tasks = Task.objects.filter(assigned_to=request.user)
+
+        return render(request, 'dashboard.html', {
+            'tasks': tasks,
+            'role': 'admin'
+        })
+
+    else:
+        # normal user (optional)
+        tasks = Task.objects.filter(assigned_to=request.user)
+
+        return render(request, 'dashboard.html', {
+            'tasks': tasks,
+            'role': 'user'
+        })
